@@ -9,13 +9,33 @@ es = Elasticsearch([{'host':'localhost','port':9200}])
 def getData():
     return re.compile('\d*\.?\d*<br>').findall(requests.get('https://www.numeroalazar.com.ar/').text)[0][:-4]
 
+# Index settings
+settings = {
+        "numbers": {
+            "properties": {
+                "number": {
+                    "type": "float",
+                    "fielddata": "true"
+                }
+            }
+        }
+     }
+
+# Create index
+es.indices.create(index="test4", ignore=400, mappings=settings)
+
 for i in range(1,10):
-    res = es.index(index="test", id=i, document= {'number': float(getData())})
+    res = es.index(index="test4", id=i, document= {'number': float(getData())})
+
+
+for i in range(1,10):
+    res = es.get(index="test4", id=i)
+    print(str(res['_source']))
 
 
 #res = es.get(index="test-index", id=1)
-res = es.search(index="test", aggs= {"avg_value": { "avg": { "field": "number" }}}, size = 0)
+s = es.search(index="test4", aggs= {'avg_number':{'avg':{ 'field': 'number'}}})
 
-print(str(res['aggregations']['avg_grade']['number']))
+print(str(s['aggregations']['avg_number']['value']))
 
 
