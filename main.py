@@ -1,14 +1,15 @@
 #!/usr/bin/env python3
 
-from flask import Flask
+from flask import Flask, render_template
+from src.webscraper import WebScraper
 import threading, time, re, requests
 
 app = Flask(__name__)
 
 # Thread A: Flask Operations
 @app.route("/")
-def hello():
-    return re.compile('\d*\.?\d*<br>').findall(requests.get('https://www.numeroalazar.com.ar/').text)[0][:-4]
+def index():
+    return render_template('index.html', random_num = WebScraper.getRandomNumber())
 
 # Thread B: Get  periodic data
 def thread_getData():

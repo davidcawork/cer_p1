@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 
 
-import re, requets
+import re, requests
 
 class WebScraper(object):
     """
@@ -9,7 +9,7 @@ class WebScraper(object):
     """
 
     @staticmethod
-    def getRandomNumber(self):
+    def getRandomNumber():
         """
             Método para obtener un numero aleatorio
         """
