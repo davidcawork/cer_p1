@@ -32,6 +32,8 @@ def logout():
     """
         Página de salida de la app
     """
+    if 'email' in session:
+        session.clear()
     return render_template('exit.html')
 
 @app.route("/login")
@@ -39,6 +41,8 @@ def login():
     """
         Página de entrada de la app
     """
+    if 'email' in session:
+        session.clear()
     return render_template('login.html')
 
 
