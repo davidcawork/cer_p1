@@ -27,6 +27,13 @@ def register():
     return render_template('register.html')
 
 
+@app.route("/success", methods = ['POST'])
+def success():
+    """
+        Página de registro exitoso de la app
+    """
+    return render_template('success.html', usr = 'Pepe')
+
 @app.route("/exit")
 def logout():
     """
