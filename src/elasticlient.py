@@ -21,5 +21,5 @@ class ElastiClient(object):
         """
             Método para asegurarse que el servicio está corriendo
         """
-        if 
-
+        if os.system('systemctl is-active --quiet elasticsearch.service') != 0:
+            os.system('systemctl status elasticsearch.service')
