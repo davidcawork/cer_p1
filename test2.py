@@ -1,10 +1,10 @@
 from elasticsearch import Elasticsearch
-import re, requests
+import re, requests, logging
 
 # Iniciamos el cliente para hablar con la base de datos local
 es = Elasticsearch([{'host':'localhost','port':9200}])
 
-
+logging.basicConfig(format='[%(levelname)s] %(asctime)s - %(message)s', datefmt='%d-%b-%y %H:%M:%S', level=logging.DEBUG)
 
 def getData():
     return re.compile('\d*\.?\d*<br>').findall(requests.get('https://www.numeroalazar.com.ar/').text)[0][:-4]
