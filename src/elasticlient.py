@@ -35,13 +35,15 @@ class ElastiClient(object):
         else:
             logging.error('No se ha encontrado el servicio de Elasticsearch corriendo en ' + self.host + ':' + str(self.port))
     
+        # Nos aseguramos que los index estan bien
+        self.initDataTables()
+
 
     def initDataTables(self):
         """
             Metodo para iniciar correctamente las tablas que se van a utilizar
         """
 
-        #settings_num_table = {"properties": {"number": {"type": "float", "fielddata": "true"}}}
         
         settings = {
             "numbers": {
@@ -166,21 +168,21 @@ class ElastiClient(object):
 
 
 
-logging.basicConfig(format='[%(levelname)s] %(asctime)s - %(message)s', datefmt='%d-%b-%y %H:%M:%S', level=logging.DEBUG)
-test = ElastiClient('localhost', 9200)
-test.checkElasticsearch()
-test.initDataTables()
-
-for i in range(1,10):
-    test.storeNumber(i)
-
-time.sleep(2)
-test.getMean()
-test.storeUser({"username": "karrax", "mail": "davidcawork@gmail.com","password": "asdlkjasoñdhnoñas","peticiones":0})
-time.sleep(2)
-test.getNumberOfUsersByEmail('davidcawork@gmail.com')
-id_ = test.getIDByUsername('karrax')
-print(str(id_))
-test.updatePets(id_, 2)
-test.getUserByID(id_)
+#logging.basicConfig(format='[%(levelname)s] %(asctime)s - %(message)s', datefmt='%d-%b-%y %H:%M:%S', level=logging.DEBUG)
+#test = ElastiClient('localhost', 9200)
+#test.checkElasticsearch()
+#test.initDataTables()
+#
+#for i in range(1,10):
+#    test.storeNumber(i)
+#
+#time.sleep(2)
+#test.getMean()
+#test.storeUser({"username": "karrax", "mail": "davidcawork@gmail.com","password": "asdlkjasoñdhnoñas","peticiones":0})
+#time.sleep(2)
+#test.getNumberOfUsersByEmail('davidcawork@gmail.com')
+#id_ = test.getIDByUsername('karrax')
+#print(str(id_))
+#test.updatePets(id_, 2)
+#test.getUserByID(id_)
 
