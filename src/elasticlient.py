@@ -17,17 +17,18 @@ class ElastiClient(object):
         self.num_table = num_table
         self.es = Elasticsearch([{'host': self.host, 'port': self.port}])
         
-    def checkElasticsearch(self):
+    def checkElasticsearch(self, isContainer):
         """
             Método para asegurarse que el servicio está corriendo
         """
 
-        # Si el servicio esta inactivo lo levantamos
-        if os.system('systemctl is-active --quiet elasticsearch.service') != 0:
-            logging.debug('Servicio elasticsearch.service inactivo... levantando')
-            os.system('systemctl start elasticsearch.service')
-        else:
-            logging.debug('Servicio elasticsearch.service activo!')
+        if not isContainer:
+            # Si el servicio esta inactivo lo levantamos
+            if os.system('systemctl is-active --quiet elasticsearch.service') != 0:
+                logging.debug('Servicio elasticsearch.service inactivo... levantando')
+                os.system('systemctl start elasticsearch.service')
+            else:
+                logging.debug('Servicio elasticsearch.service activo!')
 
         # Comprobamos que Elasticsearch esté corriendo en el puerto y en el host indicado
         if requests.get('http://' + self.host + ':' + str(self.port)).text is not None:

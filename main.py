@@ -217,7 +217,7 @@ if __name__ == '__main__':
     logging.basicConfig(format='[%(levelname)s] %(asctime)s - %(message)s', datefmt='%d-%b-%y %H:%M:%S', level=logging.DEBUG)
     
     # Nos aseguramos que Elasticsearch y beebotte estan OK!
-    elastic.checkElasticsearch()
+    elastic.checkElasticsearch(False)
     beebot.checkBeebotte()
     
     # Let's initialize the threads
