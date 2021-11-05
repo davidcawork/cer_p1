@@ -98,7 +98,7 @@ class ElastiClient(object):
         """
             Metodo para obtener la media de la base de datos
         """
-        return self.es.search(index= self.num_table, aggs= {'avg_number':{'avg':{ 'field': 'number'}}})
+        return round(self.es.search(index= self.num_table, aggs= {'avg_number':{'avg':{ 'field': 'number'}}})['aggregations']['avg_number']['value'], 2)
 
         
 
@@ -120,7 +120,7 @@ class ElastiClient(object):
         """
             Metodo para obtener el numero de ususarios con un email dado
         """
-        return self.es.search(index = self.usr_table, query = {'match': { 'mail': email}})['hits']['total']['value']
+        return self.es.search(index = self.usr_table, query = {'match_phrase': { 'mail': email}})['hits']['total']['value']
 
 
     def getNumberOfUsersByName(self, name):
@@ -136,6 +136,14 @@ class ElastiClient(object):
         """
         return self.es.search(index = self.usr_table, query = {'match': { 'username': name}})['hits']['hits'][0]['_id']
 
+    
+
+    def getIDByMail(self, mail):
+        """
+            Metodo para obtener el ID asociado a un usuario por su mail
+        """
+        return self.es.search(index = self.usr_table, query = {'match': { 'mail': mail}})['hits']['hits'][0]['_id']
+
 
     def getUserByID(self, _id):
         """
@@ -144,9 +152,9 @@ class ElastiClient(object):
         return self.es.get(index = self.usr_table, id = _id)
 
 
-    def updatePets(self, _id, _pet):
+    def updatePetsLocal(self, _id, _pet):
         """
-            Metodo para actualziar las peticiones de un ususario 
+            Metodo para actualziar las peticiones de un ususario BBDD LOCAL
         """
         
         # Primero sacamos la info del user 
@@ -154,10 +162,46 @@ class ElastiClient(object):
         
         # Hacemos el update delos datos
         new_usr_data = usr_data['_source']
-        new_usr_data['peticiones'] = new_usr_data['peticiones'] + _pet
+        new_usr_data['peticiones_media1'] = new_usr_data['peticiones_media1'] + _pet
 
         # Actualizamos al ususario
         self.es.index(index = self.usr_table, id = _id, document = new_usr_data)
+
+    
+    def updatePetsExterna(self, _id, _pet):
+        """
+            Metodo para actualziar las peticiones de un ususario BBDD EXTERNA
+        """
+        
+        # Primero sacamos la info del user 
+        usr_data = self.getUserByID(_id)
+        
+        # Hacemos el update delos datos
+        new_usr_data = usr_data['_source']
+        new_usr_data['peticiones_media2'] = new_usr_data['peticiones_media2'] + _pet
+
+        # Actualizamos al ususario
+        self.es.index(index = self.usr_table, id = _id, document = new_usr_data)
+
+
+    def getPets(self, _id):
+        """
+            Metodo para obtener las peticiones de los usuarios
+        """
+        # Primero sacamos la info del user 
+        usr_data = self.getUserByID(_id)
+
+        return [ usr_data['_source']['peticiones_media1'], usr_data['_source']['peticiones_media2'] ]
+    
+
+    def getUmbral(self, umbral):
+        """
+            Metodo para obtener umbral
+        """
+        # Primero sacamos la info del user 
+        data = self.es.search(index= self.num_table, query= {"range" : { 'number': { 'gt' : float(umbral)}}})
+
+        return data['hits']['hits']
 
 
     def getSearch(self, _index):
@@ -165,24 +209,4 @@ class ElastiClient(object):
             Metodo para realizar una busqueda en la base de datos por index 
         """
         return self.es.search(index= _index)
-
-
-
-#logging.basicConfig(format='[%(levelname)s] %(asctime)s - %(message)s', datefmt='%d-%b-%y %H:%M:%S', level=logging.DEBUG)
-#test = ElastiClient('localhost', 9200)
-#test.checkElasticsearch()
-#test.initDataTables()
-#
-#for i in range(1,10):
-#    test.storeNumber(i)
-#
-#time.sleep(2)
-#test.getMean()
-#test.storeUser({"username": "karrax", "mail": "davidcawork@gmail.com","password": "asdlkjasoñdhnoñas","peticiones":0})
-#time.sleep(2)
-#test.getNumberOfUsersByEmail('davidcawork@gmail.com')
-#id_ = test.getIDByUsername('karrax')
-#print(str(id_))
-#test.updatePets(id_, 2)
-#test.getUserByID(id_)
 
